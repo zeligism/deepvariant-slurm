@@ -1,0 +1,85 @@
+Postprocess output from call_variants to produce a VCF file.
+flags:
+
+/tmp/Bazel.runfiles_3dJvQT/runfiles/com_google_deepvariant/deepvariant/postprocess_variants.py:
+  --cnn_homref_call_min_gq: All CNN RefCalls whose GQ is less than this value
+    will have ./. genotype instead of 0/0.
+    (default: '20.0')
+    (a number)
+  --[no]group_variants: If using vcf_caller and multi-allelic sites are split
+    across multiple lines in VCF, set to False so that variants are not grouped
+    when transforming CallVariantsOutput to Variants.
+    (default: 'true')
+  --gvcf_outfile: Optional. Destination path where we will write the Genomic VCF
+    output.
+  --infile: Required. Path(s) to CallVariantOutput protos in TFRecord format to
+    postprocess. These should be the complete set of outputs for
+    call_variants.py.
+  --multi_allelic_qual_filter: The qual value below which to filter multi-
+    allelic variants.
+    (default: '1.0')
+    (a number)
+  --nonvariant_site_tfrecord_path: Optional. Path(s) to the non-variant sites
+    protos in TFRecord format to convert to gVCF file. This should be the
+    complete set of outputs from the --gvcf flag of make_examples.py.
+  --outfile: Required. Destination path where we will write output variant calls
+    in VCF format.
+  --qual_filter: Any variant with QUAL < qual_filter will be filtered in the VCF
+    file.
+    (default: '1.0')
+    (a number)
+  --ref: Required. Genome reference in FAI-indexed FASTA format. Used to
+    determine the sort order for the emitted variants and the VCF header.
+  --[no]vcf_stats_report: Optional. Output a visual report (HTML) of statistics
+    about the output VCF at the same base path given by --outfile.
+    (default: 'true')
+
+absl.logging:
+  --[no]alsologtostderr: also log to stderr?
+    (default: 'false')
+  --log_dir: directory to write logfiles into
+    (default: '')
+  --[no]logtostderr: Should only log to stderr?
+    (default: 'false')
+  --[no]showprefixforinfo: If False, do not prepend prefix to info messages when
+    it's logged to stderr, --verbosity is set to INFO level, and python logging
+    is used.
+    (default: 'true')
+  --stderrthreshold: log messages at this level, or more severe, to stderr in
+    addition to the logfile.  Possible values are 'debug', 'info', 'warning',
+    'error', and 'fatal'.  Obsoletes --alsologtostderr. Using --alsologtostderr
+    cancels the effect of this flag. Please also note that this flag is subject
+    to --verbosity and requires logfile not be stderr.
+    (default: 'fatal')
+  -v,--verbosity: Logging verbosity level. Messages logged at this level or
+    lower will be included. Set to 1 for debug logging. If the flag was not set
+    or supplied, the value will be changed from the default of -1 (warning) to 0
+    (info) after flags are parsed.
+    (default: '-1')
+    (an integer)
+
+deepvariant.haplotypes:
+  --[no]disable_haplotype_resolution: If True, makes
+    `maybe_resolve_conflicting_variants` a no-op.
+    (default: 'false')
+
+deepvariant.logging_level:
+  --logging_level: select general logging threshold.
+    (default: 'INFO')
+
+tensorflow.python.platform.app:
+  -h,--[no]help: show this help
+    (default: 'false')
+  --[no]helpfull: show full help
+    (default: 'false')
+  --[no]helpshort: show this help
+    (default: 'false')
+
+absl.flags:
+  --flagfile: Insert flag definitions from the given file into the command line.
+    (default: '')
+  --undefok: comma-separated list of flag names that it is okay to specify on
+    the command line even if the program does not define a flag with that name.
+    IMPORTANT: flags in this list that have arguments MUST use the --flag=value
+    format.
+    (default: '')

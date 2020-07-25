@@ -1,0 +1,318 @@
+Step one of DeepVariant: creates tf.Example protos for training/calling.
+flags:
+
+/tmp/Bazel.runfiles_24T2Bm/runfiles/com_google_deepvariant/deepvariant/make_examples.py:
+  --candidates: Candidate DeepVariantCalls in tfrecord format. For DEBUGGING.
+    (default: '')
+  --confident_regions: Regions that we are confident are hom-ref or a variant in
+    BED format. In BED or other equivalent format, sorted or unsorted. Contig
+    names must match those of the reference genome.
+    (default: '')
+  --[no]custom_pileup_image: Experimental - please do not set this flag. If
+    True, an additional channel will be added to encode CIGAR op length for
+    indels.
+    (default: 'false')
+  --customized_classes_labeler_classes_list: A comma-separated list of strings
+    that defines customized class labels for variants. This is only set when
+    labeler_algorithm is customized_classes_labeler.
+    (default: '')
+  --customized_classes_labeler_info_field_name: The name from the INFO field of
+    VCF where we should get the customized class labels from. This is only set
+    when labeler_algorithm is customized_classes_labeler.
+    (default: '')
+  --downsample_fraction: If not 0.0 must be a value between 0.0 and 1.0. Reads
+    will be kept (randomly) with a probability of downsample_fraction from the
+    input BAM. This argument makes it easy to create examples as though the
+    input BAM had less coverage.
+    (default: '0.0')
+    (a number)
+  --examples: Required. Path to write tf.Example protos in TFRecord format.
+  --exclude_regions: Optional. Space-separated list of regions we want to
+    exclude from processing. Elements can be region literals (e.g., chr20:10-20)
+    or paths to BED/BEDPE files. Region exclusion happens after processing the
+    --regions argument, so --region 20 --exclude_regions 20:100 does everything
+    on chromosome 20 excluding base 100
+    (default: '')
+  --gvcf: Optional. Path where we should write gVCF records in TFRecord of
+    Variant proto format.
+    (default: '')
+  --gvcf_gq_binsize: Bin size in which to quantize gVCF genotype qualities.
+    Larger bin size reduces the number of gVCF records at a loss of quality
+    granularity.
+    (default: '5')
+    (an integer)
+  --hts_block_size: Sets the htslib block size. Zero or negative uses default
+    htslib setting; larger values (e.g. 1M) may be beneficial for using remote
+    files. Currently only applies to SAM/BAM reading.
+    (default: '134217728')
+    (an integer)
+  --hts_logging_level: Sets the htslib logging threshold.
+    (default: 'HTS_LOG_WARNING')
+  --[no]keep_duplicates: If True, keep duplicate reads.
+    (default: 'false')
+  --[no]keep_secondary_alignments: If True, keep reads marked as secondary
+    alignments.
+    (default: 'false')
+  --[no]keep_supplementary_alignments: If True, keep reads marked as
+    supplementary alignments.
+    (default: 'false')
+  --labeler_algorithm: Algorithm to use to label examples in training mode. Must
+    be one of the LabelerAlgorithm enum values in the DeepVariantOptions proto.
+    (default: 'haplotype_labeler')
+  --logging_every_n_candidates: Print out the log every n candidates. The
+    smaller the number, the more frequent the logging information emits.
+    (default: '100')
+    (an integer)
+  --max_reads_per_partition: The maximum number of reads per partition that we
+    consider before following processing such as sampling and realigner.
+    (default: '1500')
+    (an integer)
+  --min_base_quality: Minimum base quality. This field indicates that we are
+    enforcing a minimum base quality score for alternate alleles. Alternate
+    alleles will only be considered if all bases in the allele have a quality
+    greater than min_base_quality.
+    (default: '10')
+    (an integer)
+  --min_mapping_quality: By default, reads with any mapping quality are kept.
+    Setting this field to a positive integer i will only keep reads that have a
+    MAPQ >= i. Note this only applies to aligned reads.
+    (default: '10')
+    (an integer)
+  --mode: Mode to run. Must be one of calling or training
+  --multi_allelic_mode: How to handle multi-allelic candidate variants. For
+    DEBUGGING
+    (default: '')
+  --[no]parse_sam_aux_fields: If True, auxiliary fields of the SAM/BAM/CRAM
+    records are parsed.
+    (default: 'false')
+  --partition_size: The maximum number of basepairs we will allow in a region
+    before splittingit into multiple smaller subregions.
+    (default: '1000')
+    (an integer)
+  --pileup_image_height: Height for the pileup image. If 0, uses the default
+    height
+    (default: '0')
+    (an integer)
+  --pileup_image_width: Width for the pileup image. If 0, uses the default width
+    (default: '0')
+    (an integer)
+  --reads: Required. Aligned, sorted, indexed BAM file containing the reads we
+    want to call. Should be aligned to a reference genome compatible with --ref.
+    Can provide multiple BAMs (comma-separated).
+  --[no]realign_reads: If True, locally realign reads before calling variants.
+    (default: 'true')
+  --ref: Required. Genome reference to use. Must have an associated FAI index as
+    well. Supports text or gzipped references. Should match the reference used
+    to align the BAM file provided to --reads.
+  --regions: Optional. Space-separated list of regions we want to process.
+    Elements can be region literals (e.g., chr20:10-20) or paths to BED/BEDPE
+    files.
+    (default: '')
+  --sample_name: Sample name to use for our sample_name in the output
+    Variant/DeepVariantCall protos. If not specified, will be inferred from the
+    header information from --reads.
+    (default: '')
+  --select_variant_types: If provided, should be a whitespace-separated string
+    of variant types to keep when generating examples. Permitted values are
+    "snps", "indels", "multi-allelics", and "all", which select bi-allelic snps,
+    bi-allelic indels, multi-allelic variants of any type, and all variants,
+    respectively. Multiple selectors can be specified, so that
+    --select_variant_types="snps indels" would keep all bi-allelic SNPs and
+    indels
+  --sequencing_type: A string representing input bam file sequencing_type.
+    Permitted values are "WGS" and "WES", which represent whole genome
+    sequencing and whole exome sequencing, respectively. This flag is
+    experimental and is not currently being used.
+  --[no]sequencing_type_image: If True, add an additional channel representing
+    the sequencing type of the input example. This flag is experimental and is
+    not currently being used.
+    (default: 'false')
+  --task: Task ID of this task
+    (default: '0')
+    (an integer)
+  --training_random_emit_ref_sites: If > 0, emit extra random reference examples
+    with this probability.
+    (default: '0.0')
+    (a number)
+  --truth_variants: Tabix-indexed VCF file containing the truth variant calls
+    for this labels which we use to label our examples.
+    (default: '')
+  --[no]use_original_quality_scores: If True, base quality scores are read from
+    OQ tag.
+    (default: 'false')
+  --[no]use_ref_for_cram: If true, use the --ref argument as the reference file
+    for the CRAM file passed to --reads.  In this case, it is required that the
+    reference file be located on a local POSIX filesystem. To disable, specify
+    --nouse_ref_for_cram.
+    (default: 'true')
+  --variant_caller: The caller to use to make examples. Must be one of the
+    VariantCaller enum values in the DeepVariantOptions proto.
+    (default: 'very_sensitive_caller')
+  --vsc_min_count_indels: Indel alleles occurring at least this many times in
+    our AlleleCount will be advanced as candidates.
+    (default: '2')
+    (an integer)
+  --vsc_min_count_snps: SNP alleles occurring at least this many times in our
+    AlleleCount will be advanced as candidates.
+    (default: '2')
+    (an integer)
+  --vsc_min_fraction_indels: Indel alleles occurring at least this fraction of
+    all counts in our AlleleCount will be advanced as candidates.
+    (default: '0.06')
+    (a number)
+  --vsc_min_fraction_snps: SNP alleles occurring at least this fraction of all
+    counts in our AlleleCount will be advanced as candidates.
+    (default: '0.12')
+    (a number)
+  --[no]write_run_info: If True, write out a MakeExamplesRunInfo proto besides
+    our examples in text_format.
+    (default: 'false')
+
+absl.logging:
+  --[no]alsologtostderr: also log to stderr?
+    (default: 'false')
+  --log_dir: directory to write logfiles into
+    (default: '')
+  --[no]logtostderr: Should only log to stderr?
+    (default: 'false')
+  --[no]showprefixforinfo: If False, do not prepend prefix to info messages when
+    it's logged to stderr, --verbosity is set to INFO level, and python logging
+    is used.
+    (default: 'true')
+  --stderrthreshold: log messages at this level, or more severe, to stderr in
+    addition to the logfile.  Possible values are 'debug', 'info', 'warning',
+    'error', and 'fatal'.  Obsoletes --alsologtostderr. Using --alsologtostderr
+    cancels the effect of this flag. Please also note that this flag is subject
+    to --verbosity and requires logfile not be stderr.
+    (default: 'fatal')
+  -v,--verbosity: Logging verbosity level. Messages logged at this level or
+    lower will be included. Set to 1 for debug logging. If the flag was not set
+    or supplied, the value will be changed from the default of -1 (warning) to 0
+    (info) after flags are parsed.
+    (default: '-1')
+    (an integer)
+
+deepvariant.logging_level:
+  --logging_level: select general logging threshold.
+    (default: 'INFO')
+
+deepvariant.realigner.realigner:
+  --aln_error_rate: Estimated sequencing error rate.
+    (default: '0.01')
+    (a number)
+  --aln_gap_extend: Gap extend score (expected to be a non-negative score).
+    Score for a gap of length g is -(gap_open + (g - 1) * gap_extend).
+    (default: '2')
+    (an integer)
+  --aln_gap_open: Gap open score (expected to be a non-negative score). Score
+    for a gap of length g is -(gap_open + (g - 1) * gap_extend).
+    (default: '8')
+    (an integer)
+  --aln_k: k-mer size used to index target sequence.
+    (default: '23')
+    (an integer)
+  --aln_match: Match score (expected to be a non-negative score).
+    (default: '4')
+    (an integer)
+  --aln_mismatch: Mismatch score (expected to be a non-negative score).
+    (default: '6')
+    (an integer)
+  --dbg_max_k: Maximum k-mer size. Larger k-mer size is used to resolve graph
+    cycles.
+    (default: '101')
+    (an integer)
+  --dbg_max_num_paths: Maximum number of paths within a graph to consider for
+    realignment. Set max_num_paths to 0 to have unlimited number of paths.
+    (default: '256')
+    (an integer)
+  --dbg_min_base_quality: Minimum base quality in a k-mer sequence to consider
+    in building the graph.
+    (default: '15')
+    (an integer)
+  --dbg_min_edge_weight: Minimum number of supporting reads to keep an edge.
+    (default: '2')
+    (an integer)
+  --dbg_min_k: Initial k-mer size to build the graph.
+    (default: '10')
+    (an integer)
+  --dbg_min_mapq: Minimum read alignment quality to consider in building the
+    graph.
+    (default: '14')
+    (an integer)
+  --dbg_step_k: Increment size for k to try in resolving graph cycles.
+    (default: '1')
+    (an integer)
+  --[no]emit_realigned_reads: If True, we will emit realigned reads if our
+    realigner_diagnostics are also enabled.
+    (default: 'false')
+  --kmer_size: K-mer size for fast pass alinger reads index.
+    (default: '32')
+    (an integer)
+  --max_num_mismatches: Num of maximum allowed mismatches for quick read to
+    haplotype alignment.
+    (default: '2')
+    (an integer)
+  --realigner_diagnostics: Root directory where the realigner should place
+    diagnostic output (such as a dump of the DeBruijn graph, and a log of
+    metrics reflecting the graph and  realignment to the haplotypes).  If empty,
+    no diagnostics are output.
+    (default: '')
+  --realignment_similarity_threshold: Similarity threshold used in realigner in
+    Smith-Watermanalignment.
+    (default: '0.16934')
+    (a number)
+  --[no]use_fast_pass_aligner: If True, fast_pass_aligner (improved performance)
+    implementation is used
+    (default: 'true')
+  --ws_max_num_supporting_reads: Maximum number of supporting reads to call a
+    reference position for local assembly.
+    (default: '-1')
+    (an integer)
+  --ws_max_window_size: Maximum window size to consider for local assembly.
+    Large noisy regions are skipped for realignment.
+    (default: '1000')
+    (an integer)
+  --ws_min_base_quality: Minimum base quality to consider in calling a reference
+    position for local assembly.
+    (default: '20')
+    (an integer)
+  --ws_min_mapq: Minimum read alignment quality to consider in calling a
+    reference position for local assembly.
+    (default: '20')
+    (an integer)
+  --ws_min_num_supporting_reads: Minimum number of supporting reads to call a
+    reference position for local assembly.
+    (default: '-1')
+    (an integer)
+  --ws_min_windows_distance: Minimum distance between candidate windows for
+    local assembly.
+    (default: '80')
+    (an integer)
+  --ws_region_expansion_in_bp: Number of bases to expand the region when
+    calculating windows; larger values add overhead but allow larger nearby
+    events to contribute evidence for assembling an region even if they are not
+    contained by the region.
+    (default: '20')
+    (an integer)
+  --[no]ws_use_window_selector_model: Activate the use of window selector
+    models.
+    (default: 'true')
+  --ws_window_selector_model: Path to a text format proto of the window selector
+    model to use.
+
+tensorflow.python.platform.app:
+  -h,--[no]help: show this help
+    (default: 'false')
+  --[no]helpfull: show full help
+    (default: 'false')
+  --[no]helpshort: show this help
+    (default: 'false')
+
+absl.flags:
+  --flagfile: Insert flag definitions from the given file into the command line.
+    (default: '')
+  --undefok: comma-separated list of flag names that it is okay to specify on
+    the command line even if the program does not define a flag with that name.
+    IMPORTANT: flags in this list that have arguments MUST use the --flag=value
+    format.
+    (default: '')
