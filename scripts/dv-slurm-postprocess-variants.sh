@@ -3,8 +3,9 @@
 #SBATCH --output=dv-slurm-postprocess-variants-%j.out
 #SBATCH --error=dv-slurm-postprocess-variants-%j.err
 #SBATCH --time=1:00:00
-#SBATCH --mem=100G
 #SBATCH --cpus-per-task=4
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=aa5525@nyu.edu
 
 echo ""
 echo "### postprocess_variants ###"

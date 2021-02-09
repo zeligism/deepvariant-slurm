@@ -2,9 +2,11 @@
 #SBATCH --job-name=dv-make-examples
 #SBATCH --output=dv-slurm-make-examples-%j.out
 #SBATCH --error=dv-slurm-make-examples-%j.err
-#SBATCH --time=2:00:00
-#SBATCH --mem=100G
-#SBATCH --cpus-per-task=8
+#SBATCH --time=4:00:00
+#SBATCH --mem=118G
+#SBATCH --cpus-per-task=24
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=aa5525@nyu.edu
 
 echo ""
 echo "### make_examples ###"
@@ -35,9 +37,10 @@ parallel -j $SLURM_CPUS_PER_TASK --eta --halt 2 --joblog "${LOG_DIR}/log" --res 
         --ref "$REF" \
         --reads "$BAM" \
         --examples "$EXAMPLES" \
+        --min_mapping_quality $MIN_MAPPING_QUALITY \
         ${CAPTURE_BED:+--regions "$CAPTURE_BED"} \
         ${GVCF_TFRECORDS:+--gvcf "$GVCF_TFRECORDS"} \
-        ${GVCF_TFRECORDS:+--gvcf_gq_binsize 5} \
+        ${GVCF_GQ_BINSIZE:+--gvcf_gq_binsize $GVCF_GQ_BINSIZE} \
         --task {}
 STATUS=$?
 set +x

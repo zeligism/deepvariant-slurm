@@ -5,6 +5,8 @@
 #SBATCH --time=2:00:00
 #SBATCH --mem=100G
 #SBATCH --cpus-per-task=8
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=aa5525@nyu.edu
 
 echo ""
 echo "### shuffle_examples (training) ###"

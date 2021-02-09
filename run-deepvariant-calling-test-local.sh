@@ -16,5 +16,5 @@ NSHARDS=4
   --ref "$REF" \
   --bam "$BAM" \
   --regions "$CAPTURE_BED" \
-  --gvcf \
+  --num_shards $NSHARDS \
   --local

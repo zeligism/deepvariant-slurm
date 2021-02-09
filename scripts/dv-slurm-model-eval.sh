@@ -7,6 +7,8 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --partition=nvidia
 #SBATCH --gres=gpu:1
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=aa5525@nyu.edu
 
 echo ""
 echo "### model_eval ###"
@@ -21,8 +23,7 @@ time singularity exec ${SIMG_GPU:+--nv} --bind /scratch "${SIMG_GPU:-$SIMG}" \
   /opt/deepvariant/bin/model_eval \
   --dataset_config_pbtxt="${OUTPUT_DIR}/examples/${SAMPLE}.validation_set.dataset_config.pbtxt" \
   --checkpoint_dir="${LOG_DIR}/train.log" \
-  --batch_size=1 \
-  --number_of_steps=50 \
-  > "${LOG_DIR}/eval.log"
+  --batch_size=$BATCH_SIZE \
+  --number_of_steps=$EVAL_STEPS
 STATUS=$?
 set +x

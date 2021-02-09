@@ -7,6 +7,8 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --partition=nvidia
 #SBATCH --gres=gpu:1
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=aa5525@nyu.edu
 
 echo ""
 echo "### model_train ###"
@@ -22,9 +24,9 @@ time singularity exec ${SIMG_GPU:+--nv} --bind /scratch "${SIMG_GPU:-$SIMG}" \
   --dataset_config_pbtxt="${OUTPUT_DIR}/examples/${SAMPLE}.training_set.dataset_config.pbtxt" \
   --train_dir="${LOG_DIR}/train.log" \
   --start_from_checkpoint="$PRETRAINED_MODEL" \
-  --number_of_steps=50 \
-  --save_interval_secs=300 \
-  --batch_size=1 \
-  --learning_rate=0.008
+  --number_of_steps=$TRAIN_STEPS \
+  --save_interval_secs=$SAVE_INTERVAL \
+  --batch_size=$BATCH_SIZE \
+  --learning_rate=$LEARNING_RATE
 STATUS=$?
 set +x

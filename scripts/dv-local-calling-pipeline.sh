@@ -7,13 +7,14 @@ set -x
 
 echo "### make_examples ###"
 seq 0 $((NSHARDS-1)) | \
-parallel -j $(nproc) --eta --halt 2 --joblog "${LOG_DIR}/log" --res "${LOG_DIR}" \
+parallel -j 4 --eta --halt 2 --joblog "${LOG_DIR}/log" --res "${LOG_DIR}" \
     singularity exec --bind /scratch "$SIMG" \
       /opt/deepvariant/bin/make_examples \
         --mode calling \
         --ref "$REF" \
         --reads "$BAM" \
         --examples "$EXAMPLES" \
+        --min_mapping_quality $MIN_MAPPING_QUALITY \
         ${CAPTURE_BED:+--regions "$CAPTURE_BED"} \
         ${GVCF_TFRECORDS:+--gvcf "$GVCF_TFRECORDS"} \
         ${GVCF_TFRECORDS:+--gvcf_gq_binsize 5} \

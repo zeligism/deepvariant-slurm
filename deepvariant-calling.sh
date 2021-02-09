@@ -3,8 +3,9 @@ set -a  # export all variables
 
 MODE=calling
 
+# DeepVariant's directory and the jobs directory
 DEEPVARIANT_DIR="${SCRATCH}/deepvariant"
-mkdir -p "$DEEPVARIANT_DIR"
+DV_DIR="${DEEPVARIANT_DIR}/scripts"
 
 # Handle args (no positional args)
 while [[ $# -gt 0 ]]
@@ -24,6 +25,9 @@ do
     ;;
     --regions)  # Regions in which variants will be captured (optional)
     CAPTURE_BED="$2"; shift; shift;
+    ;;
+    --min_mapping_quality)  # Generate examples with this min mapping quality (optional)
+    MIN_MAPPING_QUALITY="$2"; shift; shift;
     ;;
 
     --sample)  # Name of genome sample (default = sample)
@@ -63,6 +67,7 @@ LOG_DIR=${LOG_DIR:-"${DEEPVARIANT_DIR}/logs"}
 NSHARDS=${NSHARDS:-$(nproc)}
 MODEL_TYPE=${MODEL_TYPE:-"wes"}
 MODEL=${MODEL:-"/opt/models/${MODEL_TYPE}/model.ckpt"}
+MIN_MAPPING_QUALITY=${MIN_MAPPING_QUALITY:-10}
 
 # Output of DeepVariant
 OUTPUT_VCF="${OUTPUT_DIR}/${SAMPLE}.vcf.gz"
@@ -83,12 +88,23 @@ mkdir -p "${LOG_DIR}"
 
 if [[ "$RUN_LOCALLY" == true ]]
 then
-    source ./dv-local-calling-pipeline.sh
+    source "$DV_DIR/dv-local-calling-pipeline.sh"
 else
     # Submit SLURM jobs
-    make_examples_jobid=$(sbatch --parsable --export=ALL dv-slurm-make-examples.sh)
-    call_variants_jobid=$(sbatch --parsable --export=ALL --dependency=afterok:${make_examples_jobid} dv-slurm-call-variants.sh)
-    postprocess_variants_jobid=$(sbatch --parsable --export=ALL --dependency=afterok:${call_variants_jobid} dv-slurm-postprocess-variants.sh)
+    make_examples_jobid=$(
+      sbatch --parsable --export=ALL \
+             "$DV_DIR/dv-slurm-make-examples.sh"
+      )
+    call_variants_jobid=$(
+      sbatch --parsable --export=ALL \
+             --dependency=afterok:${make_examples_jobid} \
+             "$DV_DIR/dv-slurm-call-variants.sh"
+      )
+    postprocess_variants_jobid=$(
+      sbatch --parsable --export=ALL \
+             --dependency=afterok:${call_variants_jobid} \
+             "$DV_DIR/dv-slurm-postprocess-variants.sh"
+      )
     echo "Submitted jobs:"
     [[ ! -z $make_examples_jobid ]] && echo " - dv-slurm-make-examples:${make_examples_jobid}"
     [[ ! -z $call_variants_jobid ]] && echo " - dv-slurm-call-variants:${call_variants_jobid}"

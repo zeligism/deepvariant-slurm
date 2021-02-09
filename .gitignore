@@ -1,3 +1,5 @@
 .ftpconfig
 run-deepvariant-calling-exp1.sh
 run-deepvariant-calling-exp2.sh
+.DS_Store
+_old/

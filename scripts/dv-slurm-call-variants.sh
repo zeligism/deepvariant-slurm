@@ -2,11 +2,12 @@
 #SBATCH --job-name=dv-call-variants
 #SBATCH --output=dv-slurm-call-variants-%j.out
 #SBATCH --error=dv-slurm-call-variants-%j.err
-#SBATCH --time=1:00:00
-#SBATCH --mem=100G
-#SBATCH --cpus-per-task=4
+#SBATCH --time=2:00:00
 #SBATCH --partition=nvidia
 #SBATCH --gres=gpu:1
+#SBATCH --mem=64G
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=aa5525@nyu.edu
 
 echo ""
 echo "### call_variants ###"
